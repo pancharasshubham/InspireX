@@ -13,9 +13,9 @@ export default function HomePage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isMuted, setIsMuted] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showPrompt, setShowPrompt] = useState(true);
 
   const startY = useRef(0);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -25,6 +25,12 @@ export default function HomePage() {
     };
 
     fetchVideos();
+
+    const timer = setTimeout(() => {
+      setShowPrompt(false);
+    }, 2800);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const goToIndex = (index: number) => {
@@ -57,11 +63,9 @@ export default function HomePage() {
 
   return (
     <main
-      ref={containerRef}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="h-dvh overflow-hidden touch-pan-y"
-      style={{ touchAction: "pan-y" }}
+      className="relative h-dvh overflow-hidden bg-black"
     >
       {videos.map((video, index) => (
         <div id={`reel-${index}`} key={video._id}>
@@ -73,6 +77,37 @@ export default function HomePage() {
           />
         </div>
       ))}
+
+      {showPrompt && (
+  <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
+    <div className="w-full max-w-md text-center text-white animate-fadeIn">
+      <p className="mb-3 text-xs uppercase tracking-[0.35em] text-zinc-500">
+        InspireX
+      </p>
+
+      <h1 className="text-3xl font-semibold leading-tight">
+        What are you avoiding?
+      </h1>
+
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        {[
+          "Work",
+          "Study",
+          "Starting",
+          "Discomfort",
+          "Reset",
+        ].map((item) => (
+          <span
+            key={item}
+            className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur"
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
     </main>
   );
 }
