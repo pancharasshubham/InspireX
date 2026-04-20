@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 
 type ReelCardProps = {
   title: string;
-  category: string;
   videoUrl: string;
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,7 +12,6 @@ type ReelCardProps = {
 
 export default function ReelCard({
   title,
-  category,
   videoUrl,
   isMuted,
   setIsMuted,
@@ -28,15 +27,17 @@ export default function ReelCard({
       ([entry]) => {
         if (entry.isIntersecting) {
           video.play().catch(() => {});
+          setIsPaused(false);
         } else {
           video.pause();
+          setIsPaused(true);
         }
       },
       { threshold: 0.7 }
     );
 
     observer.observe(video);
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -54,54 +55,54 @@ export default function ReelCard({
   };
 
   return (
-    <section
-      style={{
-        height: "100vh",
-        position: "relative",
-        scrollSnapAlign: "start",
-        backgroundColor: "black",
-      }}
-    >
+    <section onClick={togglePlay}
+    className="relative h-dvh snap-start bg-black">
       <video
         ref={videoRef}
         src={videoUrl}
         muted={isMuted}
         loop
         playsInline
-        onClick={togglePlay}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
+        className="h-full w-full object-cover"
       />
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: "30px",
-          left: "16px",
-          color: "white",
-          background: "rgba(0,0,0,0.4)",
-          padding: "10px",
-          borderRadius: "8px",
-        }}
-      >
-        <h2>{title}</h2>
-        <p>{category}</p>
+      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
-        <button type="button" onClick={(e) => {
+      {/* Center Play Icon */}
+      {isPaused && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            setIsMuted(!isMuted);
-        }}
+            togglePlay();
+          }}
+          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/40 p-4 backdrop-blur"
         >
-            {isMuted ? "Unmute" : "Mute"}
+          <Play className="h-8 w-8 fill-white text-white" />
         </button>
+      )}
 
-        <button onClick={togglePlay}>
-          {isPaused ? "Play" : "Pause"}
-        </button>
+      {/* Bottom Left Title */}
+      <div className="absolute bottom-10 left-4 right-16 z-20">
+        <h2 className="text-lg font-semibold text-white">
+          {title}
+        </h2>
       </div>
+
+      {/* Bottom Right Sound Icon */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsMuted(!isMuted);
+        }}
+        className="absolute bottom-6 right-4 z-20 rounded-full bg-black/40 p-3 backdrop-blur"
+      >
+        {isMuted ? (
+          <VolumeX className="h-5 w-5 text-white" />
+        ) : (
+          <Volume2 className="h-5 w-5 text-white" />
+        )}
+      </button>
     </section>
   );
 }
