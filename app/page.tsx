@@ -11,49 +11,64 @@ type Video = {
 
 export default function HomePage() {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVideos = async () => {
-      try {
-        const res = await fetch("/api/videos");
-        const data = await res.json();
-
-        setVideos(data.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      const res = await fetch("/api/videos");
+      const data = await res.json();
+      setVideos(data.data);
     };
 
     fetchVideos();
   }, []);
 
-  if (loading) return <p>Loading InspireX...</p>;
-
   return (
-    <main style={{ padding: "20px" }}>
-      <h1>InspireX</h1>
-
+    <main
+      style={{
+        height: "100vh",
+        overflowY: "scroll",
+        scrollSnapType: "y mandatory",
+      }}
+    >
       {videos.map((video) => (
-        <div
+        <section
           key={video._id}
           style={{
-            marginBottom: "24px",
-            border: "1px solid #ddd",
-            padding: "12px",
+            height: "100vh",
+            position: "relative",
+            scrollSnapAlign: "start",
+            backgroundColor: "black",
           }}
         >
-          <h3>{video.title}</h3>
-          <p>{video.category}</p>
-
           <video
             src={video.videoUrl}
             controls
-            width="320"
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
           />
-        </div>
+
+          <div
+            style={{
+              position: "absolute",
+              bottom: "30px",
+              left: "16px",
+              color: "white",
+              background: "rgba(0,0,0,0.4)",
+              padding: "10px",
+              borderRadius: "8px",
+            }}
+          >
+            <h2>{video.title}</h2>
+            <p>{video.category}</p>
+          </div>
+        </section>
       ))}
     </main>
   );
