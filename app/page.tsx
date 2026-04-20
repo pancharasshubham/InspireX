@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ReelCard from "@/components/ReelCard";
 
 type Video = {
   _id: string;
@@ -31,44 +32,12 @@ export default function HomePage() {
       }}
     >
       {videos.map((video) => (
-        <section
+        <ReelCard
           key={video._id}
-          style={{
-            height: "100vh",
-            position: "relative",
-            scrollSnapAlign: "start",
-            backgroundColor: "black",
-          }}
-        >
-          <video
-            src={video.videoUrl}
-            controls
-            autoPlay
-            muted
-            loop
-            playsInline
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-
-          <div
-            style={{
-              position: "absolute",
-              bottom: "30px",
-              left: "16px",
-              color: "white",
-              background: "rgba(0,0,0,0.4)",
-              padding: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            <h2>{video.title}</h2>
-            <p>{video.category}</p>
-          </div>
-        </section>
+          title={video.title}
+          category={video.category}
+          videoUrl={video.videoUrl}
+        />
       ))}
     </main>
   );
