@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ReelCard from "@/components/ReelCard";
 
+
 type Video = {
   _id: string;
   title: string;
@@ -12,7 +13,8 @@ type Video = {
 
 export default function HomePage() {
   const [videos, setVideos] = useState<Video[]>([]);
-
+  const [isMuted, setIsMuted] = useState(true);
+  
   useEffect(() => {
     const fetchVideos = async () => {
       const res = await fetch("/api/videos");
@@ -37,6 +39,8 @@ export default function HomePage() {
           title={video.title}
           category={video.category}
           videoUrl={video.videoUrl}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
         />
       ))}
     </main>

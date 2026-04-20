@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ReelCardProps = {
   title: string;
   category: string;
   videoUrl: string;
+  isMuted: boolean;
+  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function ReelCard({
   title,
   category,
   videoUrl,
+  isMuted,
+  setIsMuted,
 }: ReelCardProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
-
     if (!video) return;
 
     const observer = new IntersectionObserver(
@@ -32,9 +36,22 @@ export default function ReelCard({
     );
 
     observer.observe(video);
-
+    
     return () => observer.disconnect();
   }, []);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play();
+      setIsPaused(false);
+    } else {
+      video.pause();
+      setIsPaused(true);
+    }
+  };
 
   return (
     <section
@@ -48,10 +65,10 @@ export default function ReelCard({
       <video
         ref={videoRef}
         src={videoUrl}
-        muted
+        muted={isMuted}
         loop
         playsInline
-        controls
+        onClick={togglePlay}
         style={{
           width: "100%",
           height: "100%",
@@ -72,6 +89,18 @@ export default function ReelCard({
       >
         <h2>{title}</h2>
         <p>{category}</p>
+
+        <button type="button" onClick={(e) => {
+            e.stopPropagation();
+            setIsMuted(!isMuted);
+        }}
+        >
+            {isMuted ? "Unmute" : "Mute"}
+        </button>
+
+        <button onClick={togglePlay}>
+          {isPaused ? "Play" : "Pause"}
+        </button>
       </div>
     </section>
   );
