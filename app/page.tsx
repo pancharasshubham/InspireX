@@ -79,6 +79,7 @@ export default function HomePage() {
             videoUrl={video.videoUrl}
             isMuted={isMuted}
             setIsMuted={setIsMuted}
+            canPlay={!isLoading && !showPrompt}
           />
         </div>
       ))}

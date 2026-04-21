@@ -8,6 +8,7 @@ type ReelCardProps = {
   videoUrl: string;
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  canPlay: boolean;
 };
 
 export default function ReelCard({
@@ -15,6 +16,7 @@ export default function ReelCard({
   videoUrl,
   isMuted,
   setIsMuted,
+  canPlay,
 }: ReelCardProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -25,6 +27,12 @@ export default function ReelCard({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+
+        if (!canPlay) {
+            video.pause();
+            return;
+        }
+
         if (entry.isIntersecting) {
           video.play().catch(() => {});
           setIsPaused(false);
@@ -39,7 +47,7 @@ export default function ReelCard({
     observer.observe(video);
 
     return () => observer.disconnect();
-  }, []);
+  }, [canPlay]);
 
   const togglePlay = () => {
     const video = videoRef.current;
