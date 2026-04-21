@@ -23,16 +23,21 @@ export default function HomePage() {
 
   const startY = useRef(0);
 
-  const goToIndex = useCallback((index: number) => {
-    const safeIndex = Math.max(0, Math.min(index, videos.length - 1));
-    setCurrentIndex(safeIndex);
+  const goToIndex = useCallback(
+     (index: number, smooth: boolean = true) => {
+        const safeIndex = Math.max(0, Math.min(index, videos.length - 1));
 
-    const target = document.getElementById(`reel-${safeIndex}`);
-    target?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, [videos.length]);
+        setCurrentIndex(safeIndex);
+
+        const target = document.getElementById(`reel-${safeIndex}`);
+
+        target?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "start",
+        });
+     },
+     [videos.length] 
+ );
 
   useEffect(() => {
     const init = async () => {
@@ -68,7 +73,7 @@ export default function HomePage() {
     if (isLoading || showPrompt) return;
 
     const timer = setTimeout(() => {
-      goToIndex(startIndex);
+      goToIndex(startIndex, false);
     }, 150);
 
     return () => clearTimeout(timer);
