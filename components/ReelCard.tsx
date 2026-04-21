@@ -63,7 +63,7 @@ export default function ReelCard({
         muted={isMuted}
         loop
         playsInline
-        className="h-full w-full object-cover"
+        className="h-full w-full object-contain bg-black"
       />
 
       <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
