@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReelCard from "@/components/ReelCard";
 import BottomNav from "@/components/BottomNav";
+import { useSearchParams } from "next/navigation";
 
 type Video = {
   _id: string;
@@ -17,37 +18,12 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPrompt, setShowPrompt] = useState(true);
 
+  const searchParams = useSearchParams();
+  const startIndex = Number(searchParams.get("index") || 0);
+
   const startY = useRef(0);
 
-  useEffect(() => {
-  const init = async () => {
-    const res = await fetch("/api/videos");
-    const data = await res.json();
-
-    setVideos(data.data);
-    const introSeen = sessionStorage.getItem("introSeen");
-
-    if (introSeen) {
-      setIsLoading(false);
-      setShowPrompt(false);
-      return;
-    }
-
-    setTimeout(() => {
-      setIsLoading(false);
-      setShowPrompt(true);
-
-      setTimeout(() => {
-        setShowPrompt(false);
-        sessionStorage.setItem("introSeen", "true");
-      }, 3400);
-    }, 1600);
-  };
-
-  init();
-}, []);
-
-  const goToIndex = (index: number) => {
+  const goToIndex = useCallback((index: number) => {
     const safeIndex = Math.max(0, Math.min(index, videos.length - 1));
     setCurrentIndex(safeIndex);
 
@@ -56,7 +32,47 @@ export default function HomePage() {
       behavior: "smooth",
       block: "start",
     });
-  };
+  }, [videos.length]);
+
+  useEffect(() => {
+    const init = async () => {
+      const res = await fetch("/api/videos");
+      const data = await res.json();
+
+      setVideos(data.data);
+
+      const introSeen = sessionStorage.getItem("introSeen");
+
+      if (introSeen) {
+        setIsLoading(false);
+        setShowPrompt(false);
+        return;
+      }
+
+      setTimeout(() => {
+        setIsLoading(false);
+        setShowPrompt(true);
+
+        setTimeout(() => {
+          setShowPrompt(false);
+          sessionStorage.setItem("introSeen", "true");
+        }, 3400);
+      }, 1600);
+    };
+
+    init();
+  }, []);
+
+  useEffect(() => {
+    if (!videos.length) return;
+    if (isLoading || showPrompt) return;
+
+    const timer = setTimeout(() => {
+      goToIndex(startIndex);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [videos.length, startIndex, isLoading, showPrompt, goToIndex]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     startY.current = e.touches[0].clientY;
@@ -79,7 +95,7 @@ export default function HomePage() {
     <main
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative h-dvh overflow-hidden bg-black overscroll-none"  //Mobile overscroll refresh issue on browser mode.
+      className="relative h-dvh overflow-hidden bg-black overscroll-none pb-24"
     >
       {videos.map((video, index) => (
         <div id={`reel-${index}`} key={video._id}>
@@ -94,35 +110,35 @@ export default function HomePage() {
       ))}
 
       {showPrompt && (
-      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
-        <div className="w-full max-w-md text-center text-white animate-fadeIn">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-zinc-500">
-            InspireX
-          </p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
+          <div className="w-full max-w-md text-center text-white animate-fadeIn">
+            <p className="mb-3 text-xs uppercase tracking-[0.35em] text-zinc-500">
+              InspireX
+            </p>
 
-          <h1 className="text-3xl font-semibold leading-tight">
-            What are you avoiding?
-          </h1>
+            <h1 className="text-3xl font-semibold leading-tight">
+              What are you avoiding?
+            </h1>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            {[
-              "Work",
-              "Study",
-              "Starting",
-              "Discomfort",
-              "Reset",
-            ].map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur"
-              >
-                {item}
-              </span>
-            ))}
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              {[
+                "Work",
+                "Study",
+                "Starting",
+                "Discomfort",
+                "Reset",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-)}
+      )}
 
       {isLoading && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black text-white">
@@ -139,9 +155,10 @@ export default function HomePage() {
             <span className="h-2 w-2 animate-bounce rounded-full bg-white [animation-delay:0.15s]" />
             <span className="h-2 w-2 animate-bounce rounded-full bg-white [animation-delay:0.3s]" />
           </div>
-      </div>
-)}
-        {!isLoading && !showPrompt && <BottomNav />}
+        </div>
+      )}
+
+      {!isLoading && !showPrompt && <BottomNav />}
     </main>
   );
 }

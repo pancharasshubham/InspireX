@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 
 type Video = {
@@ -11,6 +12,7 @@ type Video = {
 
 export default function LibraryPage() {
   const [videos, setVideos] = useState<Video[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -23,16 +25,24 @@ export default function LibraryPage() {
   }, []);
 
   return (
-    <main className="min-h-dvh bg-black pb-20">
-      <div className="grid grid-cols-3 gap-1">
-        {videos.map((video) => (
-          <div key={video._id} className="aspect-9/16 bg-zinc-900">
+    <main className="min-h-dvh bg-black pb-24">
+      <div className="grid grid-cols-3 gap-0.5">
+        {videos.map((video, index) => (
+          <button
+            key={video._id}
+            onClick={() => router.push(`/feed?index=${index}`)}
+            className="relative aspect-9/16 overflow-hidden bg-zinc-900"
+          >
             <video
               src={video.videoUrl}
               muted
+              playsInline
+              preload="metadata"
               className="h-full w-full object-cover"
             />
-          </div>
+
+            <div className="absolute inset-0 bg-black/10" />
+          </button>
         ))}
       </div>
 
