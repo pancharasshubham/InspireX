@@ -70,7 +70,7 @@ export default function HomePage() {
     <main
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative h-dvh overflow-hidden bg-black"
+      className="relative h-dvh overflow-hidden bg-black overscroll-none"  //Mobile overscroll refresh issue on browser mode.
     >
       {videos.map((video, index) => (
         <div id={`reel-${index}`} key={video._id}>
