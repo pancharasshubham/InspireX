@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 
 type ReelCardProps = {
   title: string;
@@ -19,7 +19,7 @@ export default function ReelCard({
   canPlay,
 }: ReelCardProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const [showIcon, setShowIcon] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -27,18 +27,16 @@ export default function ReelCard({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-
         if (!canPlay) {
-            video.pause();
-            return;
+          video.pause();
+          return;
         }
 
         if (entry.isIntersecting) {
+          video.currentTime = 0;
           video.play().catch(() => {});
-          setIsPaused(false);
         } else {
           video.pause();
-          setIsPaused(true);
         }
       },
       { threshold: 0.7 }
@@ -49,22 +47,20 @@ export default function ReelCard({
     return () => observer.disconnect();
   }, [canPlay]);
 
-  const togglePlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
+  const toggleSound = () => {
+    setIsMuted(!isMuted);
+    setShowIcon(true);
 
-    if (video.paused) {
-      video.play();
-      setIsPaused(false);
-    } else {
-      video.pause();
-      setIsPaused(true);
-    }
+    setTimeout(() => {
+      setShowIcon(false);
+    }, 700);
   };
 
   return (
-    <section onClick={togglePlay}
-    className="relative h-dvh snap-start bg-black">
+    <section
+      onClick={toggleSound}
+      className="relative h-dvh snap-start bg-black"
+    >
       <video
         ref={videoRef}
         src={videoUrl}
@@ -74,43 +70,25 @@ export default function ReelCard({
         className="h-full w-full object-contain bg-black"
       />
 
-      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-      {/* Center Play Icon */}
-      {isPaused && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            togglePlay();
-          }}
-          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/40 p-4 backdrop-blur"
-        >
-          <Play className="h-8 w-8 fill-white text-white" />
-        </button>
-      )}
-
-      {/* Bottom Left Title */}
-      <div className="absolute bottom-10 left-4 right-16 z-20">
+      <div className="absolute bottom-8 left-4 right-4 z-10">
         <h2 className="text-lg font-semibold text-white">
           {title}
         </h2>
       </div>
 
-      {/* Bottom Right Sound Icon */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsMuted(!isMuted);
-        }}
-        className="absolute bottom-6 right-4 z-20 rounded-full bg-black/40 p-3 backdrop-blur"
-      >
-        {isMuted ? (
-          <VolumeX className="h-5 w-5 text-white" />
-        ) : (
-          <Volume2 className="h-5 w-5 text-white" />
-        )}
-      </button>
+      {showIcon && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center">
+          <div className="rounded-full bg-black/40 p-4 backdrop-blur animate-pulse">
+            {isMuted ? (
+              <VolumeX className="h-7 w-7 text-white" />
+            ) : (
+              <Volume2 className="h-7 w-7 text-white" />
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
