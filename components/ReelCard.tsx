@@ -70,7 +70,7 @@ export default function ReelCard({
         className="h-full w-full object-contain bg-black"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
 
       <div className="absolute bottom-8 left-4 right-4 z-10">
         <h2 className="text-lg font-semibold text-white">
