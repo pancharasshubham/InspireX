@@ -24,6 +24,10 @@ export default function LibraryPage() {
     fetchVideos();
   }, []);
 
+    const getThumbnail = (url: string) => {
+      return `${url}?tr=so-1,w-400,h-700`;
+    };
+
   return (
     <main className="min-h-dvh bg-black pb-24">
       <div className="grid grid-cols-3 gap-0.5">
@@ -33,12 +37,10 @@ export default function LibraryPage() {
             onClick={() => router.push(`/feed?index=${index}`)}
             className="relative aspect-9/16 overflow-hidden bg-zinc-900"
           >
-            <video
-              src={video.videoUrl}
-              muted
-              playsInline
-              preload="metadata"
-              className="h-full w-full object-cover"
+            <img
+               src={getThumbnail(video.videoUrl)}
+               alt={video.title}
+               className="h-full w-full object-cover"
             />
 
             <div className="absolute inset-0 bg-black/10" />

@@ -1,169 +1,144 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import ReelCard from "@/components/ReelCard";
-import BottomNav from "@/components/BottomNav";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
-type Video = {
-  _id: string;
-  title: string;
-  videoUrl: string;
-};
+export default function UploadPage() {
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("motivation");
 
-export default function HomePage() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [isMuted, setIsMuted] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showPrompt, setShowPrompt] = useState(true);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [thumbFile, setThumbFile] = useState<File | null>(null);
 
-  const searchParams = useSearchParams();
-  const startIndex = Number(searchParams.get("index") || 0);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const startY = useRef(0);
+  const handleUpload = async () => {
+    if (!title || !videoFile || !thumbFile) {
+      setMessage("Title, video, and thumbnail are required.");
+      return;
+    }
 
-  const goToIndex = useCallback(
-     (index: number, smooth: boolean = true) => {
-        const safeIndex = Math.max(0, Math.min(index, videos.length - 1));
+    try {
+      setLoading(true);
+      setMessage("");
 
-        setCurrentIndex(safeIndex);
+      // Upload video
+      const videoForm = new FormData();
+      videoForm.append("file", videoFile);
 
-        const target = document.getElementById(`reel-${safeIndex}`);
+      const videoRes = await fetch("/api/upload", {
+        method: "POST",
+        body: videoForm,
+      });
 
-        target?.scrollIntoView({
-        behavior: smooth ? "smooth" : "auto",
-        block: "start",
-        });
-     },
-     [videos.length] 
- );
+      const videoData = await videoRes.json();
+      const videoUrl = videoData.data.url;
 
-  useEffect(() => {
-    const init = async () => {
-      const res = await fetch("/api/videos");
-      const data = await res.json();
+      // Upload thumbnail
+      const thumbForm = new FormData();
+      thumbForm.append("file", thumbFile);
 
-      setVideos(data.data);
+      const thumbRes = await fetch("/api/upload", {
+        method: "POST",
+        body: thumbForm,
+      });
 
-      const introSeen = sessionStorage.getItem("introSeen");
+      const thumbData = await thumbRes.json();
+      const thumbnailUrl = thumbData.data.url;
 
-      if (introSeen) {
-        setIsLoading(false);
-        setShowPrompt(false);
-        return;
-      }
+      // Save reel
+      await fetch("/api/videos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          category,
+          videoUrl,
+          thumbnailUrl,
+        }),
+      });
 
-      setTimeout(() => {
-        setIsLoading(false);
-        setShowPrompt(true);
+      setMessage("Upload successful.");
 
-        setTimeout(() => {
-          setShowPrompt(false);
-          sessionStorage.setItem("introSeen", "true");
-        }, 3400);
-      }, 1600);
-    };
-
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (!videos.length) return;
-    if (isLoading || showPrompt) return;
-
-    const timer = setTimeout(() => {
-      goToIndex(startIndex, false);
-    }, 150);
-
-    return () => clearTimeout(timer);
-  }, [videos.length, startIndex, isLoading, showPrompt, goToIndex]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    startY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const endY = e.changedTouches[0].clientY;
-    const diff = startY.current - endY;
-
-    if (Math.abs(diff) < 60) return;
-
-    if (diff > 0) {
-      goToIndex(currentIndex + 1);
-    } else {
-      goToIndex(currentIndex - 1);
+      setTitle("");
+      setCategory("motivation");
+      setVideoFile(null);
+      setThumbFile(null);
+    } catch (error) {
+      console.error(error);
+      setMessage("Upload failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      className="relative h-dvh overflow-hidden bg-black overscroll-none pb-24"
-    >
-      {videos.map((video, index) => (
-        <div id={`reel-${index}`} key={video._id}>
-          <ReelCard
-            title={video.title}
-            videoUrl={video.videoUrl}
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-            canPlay={!isLoading && !showPrompt}
+    <main className="min-h-dvh bg-black px-5 py-8 text-white">
+      <div className="mx-auto max-w-md">
+        <h1 className="text-3xl font-semibold">Upload Reel</h1>
+        <p className="mt-2 text-sm text-zinc-400">
+          Add video + thumbnail for InspireX library
+        </p>
+
+        <div className="mt-8 space-y-5">
+          <input
+            type="text"
+            placeholder="Reel title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 outline-none"
           />
-        </div>
-      ))}
 
-      {showPrompt && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
-          <div className="w-full max-w-md text-center text-white animate-fadeIn">
-            <p className="mb-3 text-xs uppercase tracking-[0.35em] text-zinc-500">
-              InspireX
-            </p>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 outline-none"
+          >
+            <option value="motivation">Motivation</option>
+            <option value="discipline">Discipline</option>
+            <option value="focus">Focus</option>
+            <option value="mindset">Mindset</option>
+            <option value="comeback">Comeback</option>
+            <option value="coding">Coding</option>
+          </select>
 
-            <h1 className="text-3xl font-semibold leading-tight">
-              What are you avoiding?
-            </h1>
-
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              {[
-                "Work",
-                "Study",
-                "Starting",
-                "Discomfort",
-                "Reset",
-              ].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
+          <div className="rounded-xl border border-dashed border-white/15 bg-zinc-900 p-4">
+            <p className="mb-2 text-sm text-zinc-400">Select Video</p>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={(e) =>
+                setVideoFile(e.target.files?.[0] || null)
+              }
+            />
           </div>
-        </div>
-      )}
 
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black text-white">
-          <h1 className="text-4xl font-semibold tracking-tight">
-            InspireX
-          </h1>
-
-          <p className="mt-3 text-sm text-zinc-400">
-            Loading focus...
-          </p>
-
-          <div className="mt-6 flex gap-2">
-            <span className="h-2 w-2 animate-bounce rounded-full bg-white" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-white [animation-delay:0.15s]" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-white [animation-delay:0.3s]" />
+          <div className="rounded-xl border border-dashed border-white/15 bg-zinc-900 p-4">
+            <p className="mb-2 text-sm text-zinc-400">Select Thumbnail</p>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setThumbFile(e.target.files?.[0] || null)
+              }
+            />
           </div>
-        </div>
-      )}
 
-      {!isLoading && !showPrompt && <BottomNav />}
+          <button
+            onClick={handleUpload}
+            disabled={loading}
+            className="w-full rounded-xl bg-white py-3 font-medium text-black disabled:opacity-50"
+          >
+            {loading ? "Uploading..." : "Upload Reel"}
+          </button>
+
+          {message && (
+            <p className="text-sm text-zinc-300">{message}</p>
+          )}
+        </div>
+      </div>
     </main>
   );
 }
