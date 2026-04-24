@@ -6,15 +6,15 @@ export default function UploadPage() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("motivation");
 
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [videoName, setVideoName] = useState("");
+  const [thumbName, setThumbName] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleUpload = async () => {
-    if (!title || !videoFile || !thumbFile) {
-      setMessage("Title, video, and thumbnail are required.");
+    if (!title || !videoName || !thumbName) {
+      setMessage("Title, video filename, and thumbnail filename are required.");
       return;
     }
 
@@ -22,82 +22,44 @@ export default function UploadPage() {
       setLoading(true);
       setMessage("");
 
-    // VIDEO
-    const videoForm = new FormData();
-    videoForm.append("file", videoFile);
+      const saveRes = await fetch("/api/videos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          category,
+          videoUrl: `/videos/${videoName}`,
+          thumbnailUrl: `/thumbnails/${thumbName}`,
+        }),
+      });
 
-    const videoRes = await fetch("/api/upload", {
-      method: "POST",
-      body: videoForm,
-    });
+      if (!saveRes.ok) {
+        throw new Error("Failed to save reel");
+      }
 
-    if (!videoRes.ok) throw new Error("Video upload failed");
+      setMessage("Reel added successfully.");
 
-    const videoData = await videoRes.json();
-
-    if (!videoData?.data?.url) {
-      throw new Error("Invalid video URL");
-    }
-
-    const videoUrl = videoData.data.url;
-
-    // THUMBNAIL
-    const thumbForm = new FormData();
-    thumbForm.append("file", thumbFile);
-
-    const thumbRes = await fetch("/api/upload", {
-      method: "POST",
-      body: thumbForm,
-    });
-
-    if (!thumbRes.ok) throw new Error("Thumbnail upload failed");
-
-    const thumbData = await thumbRes.json();
-
-    if (!thumbData?.data?.url) {
-      throw new Error("Invalid thumbnail URL");
-    }
-
-    const thumbnailUrl = thumbData.data.url;
-
-    // SAVE DB
-    const saveRes = await fetch("/api/videos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        category,
-        videoUrl,
-        thumbnailUrl,
-      }),
-    });
-
-    if (!saveRes.ok) throw new Error("Failed to save reel");
-
-    setMessage("Reel uploaded successfully.");
-
-    setTitle("");
-    setCategory("motivation");
-    setVideoFile(null);
-    setThumbFile(null);
-
+      setTitle("");
+      setCategory("motivation");
+      setVideoName("");
+      setThumbName("");
     } catch (error) {
       console.error(error);
-      setMessage("Upload failed. Check console.");
+      setMessage("Failed to add reel.");
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <main className="min-h-dvh bg-black px-5 py-8 text-white">
       <div className="mx-auto max-w-md">
-        <h1 className="text-3xl font-semibold">Upload Reel</h1>
+        <h1 className="text-3xl font-semibold">Add Reel</h1>
+
         <p className="mt-2 text-sm text-zinc-400">
-          Add video + thumbnail for InspireX library
+          Put files in public/videos and public/thumbnails first
         </p>
 
         <div className="mt-8 space-y-5">
@@ -122,34 +84,28 @@ export default function UploadPage() {
             <option value="coding">Coding</option>
           </select>
 
-          <div className="rounded-xl border border-dashed border-white/15 bg-zinc-900 p-4">
-            <p className="mb-2 text-sm text-zinc-400">Select Video</p>
-            <input
-              type="file"
-              accept="video/*"
-              onChange={(e) =>
-                setVideoFile(e.target.files?.[0] || null)
-              }
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Video filename (example.mp4)"
+            value={videoName}
+            onChange={(e) => setVideoName(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 outline-none"
+          />
 
-          <div className="rounded-xl border border-dashed border-white/15 bg-zinc-900 p-4">
-            <p className="mb-2 text-sm text-zinc-400">Select Thumbnail</p>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setThumbFile(e.target.files?.[0] || null)
-              }
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Thumbnail filename (example.jpg)"
+            value={thumbName}
+            onChange={(e) => setThumbName(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 outline-none"
+          />
 
           <button
             onClick={handleUpload}
             disabled={loading}
             className="w-full rounded-xl bg-white py-3 font-medium text-black disabled:opacity-50"
           >
-            {loading ? "Uploading..." : "Upload Reel"}
+            {loading ? "Saving..." : "Add Reel"}
           </button>
 
           {message && (
