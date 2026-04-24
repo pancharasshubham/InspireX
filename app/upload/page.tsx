@@ -22,57 +22,75 @@ export default function UploadPage() {
       setLoading(true);
       setMessage("");
 
-      // Upload video
-      const videoForm = new FormData();
-      videoForm.append("file", videoFile);
+    // VIDEO
+    const videoForm = new FormData();
+    videoForm.append("file", videoFile);
 
-      const videoRes = await fetch("/api/upload", {
-        method: "POST",
-        body: videoForm,
-      });
+    const videoRes = await fetch("/api/upload", {
+      method: "POST",
+      body: videoForm,
+    });
 
-      const videoData = await videoRes.json();
-      const videoUrl = videoData.data.url;
+    if (!videoRes.ok) throw new Error("Video upload failed");
 
-      // Upload thumbnail
-      const thumbForm = new FormData();
-      thumbForm.append("file", thumbFile);
+    const videoData = await videoRes.json();
 
-      const thumbRes = await fetch("/api/upload", {
-        method: "POST",
-        body: thumbForm,
-      });
+    if (!videoData?.data?.url) {
+      throw new Error("Invalid video URL");
+    }
 
-      const thumbData = await thumbRes.json();
-      const thumbnailUrl = thumbData.data.url;
+    const videoUrl = videoData.data.url;
 
-      // Save reel
-      await fetch("/api/videos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          category,
-          videoUrl,
-          thumbnailUrl,
-        }),
-      });
+    // THUMBNAIL
+    const thumbForm = new FormData();
+    thumbForm.append("file", thumbFile);
 
-      setMessage("Upload successful.");
+    const thumbRes = await fetch("/api/upload", {
+      method: "POST",
+      body: thumbForm,
+    });
 
-      setTitle("");
-      setCategory("motivation");
-      setVideoFile(null);
-      setThumbFile(null);
+    if (!thumbRes.ok) throw new Error("Thumbnail upload failed");
+
+    const thumbData = await thumbRes.json();
+
+    if (!thumbData?.data?.url) {
+      throw new Error("Invalid thumbnail URL");
+    }
+
+    const thumbnailUrl = thumbData.data.url;
+
+    // SAVE DB
+    const saveRes = await fetch("/api/videos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        category,
+        videoUrl,
+        thumbnailUrl,
+      }),
+    });
+
+    if (!saveRes.ok) throw new Error("Failed to save reel");
+
+    setMessage("Reel uploaded successfully.");
+
+    setTitle("");
+    setCategory("motivation");
+    setVideoFile(null);
+    setThumbFile(null);
+
     } catch (error) {
       console.error(error);
-      setMessage("Upload failed.");
+      setMessage("Upload failed. Check console.");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <main className="min-h-dvh bg-black px-5 py-8 text-white">

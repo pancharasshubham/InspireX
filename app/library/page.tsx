@@ -8,6 +8,7 @@ type Video = {
   _id: string;
   title: string;
   videoUrl: string;
+  thumbnailUrl?: string;
 };
 
 export default function LibraryPage() {
@@ -16,17 +17,18 @@ export default function LibraryPage() {
 
   useEffect(() => {
     const fetchVideos = async () => {
-      const res = await fetch("/api/videos");
-      const data = await res.json();
-      setVideos(data.data);
+      try {
+        const res = await fetch("/api/videos");
+        const data = await res.json();
+
+        setVideos(data.data || []);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchVideos();
   }, []);
-
-    const getThumbnail = (url: string) => {
-      return `${url}?tr=so-1,w-400,h-700`;
-    };
 
   return (
     <main className="min-h-dvh bg-black pb-24">
@@ -35,13 +37,19 @@ export default function LibraryPage() {
           <button
             key={video._id}
             onClick={() => router.push(`/feed?index=${index}`)}
-            className="relative aspect-9/16 overflow-hidden bg-zinc-900"
+            className="relative aspect-[9/16] overflow-hidden bg-zinc-900"
           >
-            <img
-               src={getThumbnail(video.videoUrl)}
-               alt={video.title}
-               className="h-full w-full object-cover"
-            />
+            {video.thumbnailUrl ? (
+              <img
+                src={video.thumbnailUrl}
+                alt={video.title}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs text-zinc-500 px-2 text-center">
+                No Thumbnail
+              </div>
+            )}
 
             <div className="absolute inset-0 bg-black/10" />
           </button>

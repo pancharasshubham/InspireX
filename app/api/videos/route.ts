@@ -9,19 +9,20 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const newVideo = await Video.create({
-        title: body.title,
-        videoUrl: body.videoUrl,
-        category: body.category,
+      title: body.title,
+      videoUrl: body.videoUrl,
+      thumbnailUrl: body.thumbnailUrl,
+      category: body.category,
     });
 
-    return NextResponse.json({
+    return NextResponse.json(
+      {
         success: true,
         message: "Video created successfully",
         data: newVideo,
-    },
-    { status: 201 }
-    ); 
-
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error(error);
 
@@ -34,15 +35,15 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    await connectDB();  
+    await connectDB();
 
     const videos = await Video.find().sort({ createdAt: -1 });
 
     return NextResponse.json({
-        success: true,
-        count: videos.length,
-        data: videos,
-    });     
+      success: true,
+      count: videos.length,
+      data: videos,
+    });
   } catch (error) {
     console.error(error);
 
