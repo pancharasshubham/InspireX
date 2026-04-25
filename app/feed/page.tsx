@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+export const dynamic = "force-dynamic";
+
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import ReelCard from "@/components/ReelCard";
 import BottomNav from "@/components/BottomNav";
 import { useSearchParams } from "next/navigation";
@@ -12,7 +14,7 @@ type Video = {
   thumbnailUrl?: string;
 };
 
-export default function FeedPage() {
+function FeedContent() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isMuted, setIsMuted] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -166,5 +168,13 @@ export default function FeedPage() {
 
       {!isLoading && !showPrompt && <BottomNav />}
     </main>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black text-white"><h1 className="text-4xl font-semibold tracking-tight">InspireX</h1><p className="mt-3 text-sm text-zinc-400">Loading focus...</p></div>}>
+      <FeedContent />
+    </Suspense>
   );
 }
