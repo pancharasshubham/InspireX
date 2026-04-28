@@ -21,24 +21,6 @@ function FeedContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPrompt, setShowPrompt] = useState(true);
 
-  const promptPool = [
-  "Starting the hard task",
-  "Failure",
-  "Being judged",
-  "Your unfinished work",
-  "Wasted time",
-  "Phone addiction",
-  "Discomfort",
-  "Your future self",
-  "Responsibility",
-  "Hard work",
-  "Consistency",
-  "The truth about your habits",
-  "Trying again",
-  "Silence",
-  "Reality",
-];
-
   const [promptOptions, setPromptOptions] = useState<string[]>([]);
 
   const searchParams = useSearchParams();
@@ -62,13 +44,31 @@ function FeedContent() {
      [videos.length] 
  );
 
-  const getRandomPrompts = () => {
-  return [...promptPool]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 5);
-};
-
   useEffect(() => {
+    const promptPool = [
+      "Starting the hard task",
+      "Failure",
+      "Being judged",
+      "Your unfinished work",
+      "Wasted time",
+      "Phone addiction",
+      "Discomfort",
+      "Your future self",
+      "Responsibility",
+      "Hard work",
+      "Consistency",
+      "The truth about your habits",
+      "Trying again",
+      "Silence",
+      "Reality",
+    ];
+
+    const getRandomPrompts = () => {
+      return [...promptPool]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 5);
+    };
+
     const init = async () => {
       const res = await fetch("/api/videos");
       const data = await res.json();
