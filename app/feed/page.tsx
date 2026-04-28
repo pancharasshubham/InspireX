@@ -21,6 +21,26 @@ function FeedContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPrompt, setShowPrompt] = useState(true);
 
+  const promptPool = [
+  "Starting the hard task",
+  "Failure",
+  "Being judged",
+  "Your unfinished work",
+  "Wasted time",
+  "Phone addiction",
+  "Discomfort",
+  "Your future self",
+  "Responsibility",
+  "Hard work",
+  "Consistency",
+  "The truth about your habits",
+  "Trying again",
+  "Silence",
+  "Reality",
+];
+
+  const [promptOptions, setPromptOptions] = useState<string[]>([]);
+
   const searchParams = useSearchParams();
   const startIndex = Number(searchParams.get("index") || 0);
 
@@ -42,6 +62,12 @@ function FeedContent() {
      [videos.length] 
  );
 
+  const getRandomPrompts = () => {
+  return [...promptPool]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+};
+
   useEffect(() => {
     const init = async () => {
       const res = await fetch("/api/videos");
@@ -59,13 +85,14 @@ function FeedContent() {
 
       setTimeout(() => {
         setIsLoading(false);
+        setPromptOptions(getRandomPrompts());
         setShowPrompt(true);
 
         setTimeout(() => {
           setShowPrompt(false);
           sessionStorage.setItem("introSeen", "true");
-        }, 3400);
-      }, 1600);
+        }, 8000);
+      }, 600);
     };
 
     init();
@@ -127,21 +154,18 @@ function FeedContent() {
             <h1 className="text-3xl font-semibold leading-tight">
               What are you avoiding?
             </h1>
-
+            <p className="mt-2 text-sm text-zinc-400">
+              Choose honestly.
+            </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
-              {[
-                "Work",
-                "Study",
-                "Starting",
-                "Discomfort",
-                "Reset",
-              ].map((item) => (
-                <span
+              {promptOptions.map((item) => (
+                <button
                   key={item}
-                  className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur"
+                  onClick={() => setShowPrompt(false)}
+                  className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur active:scale-95"
                 >
                   {item}
-                </span>
+                </button>
               ))}
             </div>
           </div>

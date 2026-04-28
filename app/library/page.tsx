@@ -37,7 +37,7 @@ export default function LibraryPage() {
           <button
             key={video._id}
             onClick={() => router.push(`/feed?index=${index}`)}
-            className="relative aspect-[9/16] overflow-hidden bg-zinc-900"
+            className="relative aspect-9/16 overflow-hidden bg-zinc-900"
           >
             {video.thumbnailUrl ? (
               <img
