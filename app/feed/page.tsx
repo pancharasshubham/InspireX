@@ -25,6 +25,8 @@ function FeedContent() {
 
   const searchParams = useSearchParams();
   const startIndex = Number(searchParams.get("index") || 0);
+  const [initialIndex, setInitialIndex] = useState(0);
+  
 
   const startY = useRef(0);
 
@@ -72,8 +74,31 @@ function FeedContent() {
     const init = async () => {
       const res = await fetch("/api/videos");
       const data = await res.json();
+      
+      const lastIndex = Number(
+        localStorage.getItem("lastIndex") || 0
+      );
 
-      setVideos(data.data);
+      const lastOpen = Number(
+        localStorage.getItem("lastOpen") || 0
+      );
+
+      const now = Date.now();
+
+      const shouldRefresh =
+       now - lastOpen > 1000 * 60 * 60 * 2;
+
+      localStorage.setItem(
+      "lastOpen",
+      now.toString()
+      );
+
+      const finalVideos = shouldRefresh
+        ? [...data.data].sort(() => Math.random() - 0.5)
+        : data.data;
+
+      setVideos(finalVideos);
+      setInitialIndex(shouldRefresh ? 0 : lastIndex);
 
       const introSeen = sessionStorage.getItem("introSeen");
 
@@ -99,15 +124,22 @@ function FeedContent() {
   }, []);
 
   useEffect(() => {
+    localStorage.setItem(
+      "lastIndex",
+      currentIndex.toString()
+    );
+  }, [currentIndex]);
+
+  useEffect(() => {
     if (!videos.length) return;
     if (isLoading || showPrompt) return;
 
-    const timer = setTimeout(() => {
-      goToIndex(startIndex, false);
+    const timer = setTimeout(() => {  
+      goToIndex(initialIndex, false);
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [videos.length, startIndex, isLoading, showPrompt, goToIndex]);
+  }, [videos.length,  initialIndex, startIndex, isLoading, showPrompt, goToIndex]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     startY.current = e.touches[0].clientY;
