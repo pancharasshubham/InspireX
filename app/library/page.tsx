@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
+import Image from "next/image";
 
 type Video = {
   _id: string;
@@ -40,7 +41,7 @@ export default function LibraryPage() {
             className="relative aspect-9/16 overflow-hidden bg-zinc-900"
           >
             {video.thumbnailUrl ? (
-              <img
+              <Image
                 src={video.thumbnailUrl}
                 alt={video.title}
                 className="h-full w-full object-cover"
