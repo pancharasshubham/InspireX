@@ -2,11 +2,23 @@
 
 A focused motivational reel app designed to interrupt doomscrolling and reduce friction toward action.
 
-Instead of infinite algorithmic distraction, InspireX delivers a curated feed of short motivational videos with psychological prompts aimed at pushing users back into intentional work.
-
 Built as a mobile-first Progressive Web App (PWA) using Next.js.
 
 ---
+
+## Live Demo
+
+https://inspire-x-pink.vercel.app
+
+Install as a PWA for the best experience.
+
+---
+
+## Preview
+
+![Feed Screen](./public/screenshots/feed.png)
+
+![Awareness Prompt](./public/screenshots/prompt.png)
 
 ## Core Idea
 
