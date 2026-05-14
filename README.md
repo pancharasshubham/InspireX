@@ -16,9 +16,10 @@ Install as a PWA for the best experience.
 
 ## Preview
 
-![Feed Screen](./public/screenshots/feed.png)
-
-![Awareness Prompt](./public/screenshots/prompt.png)
+<p align="center">
+  <img src="./public/screenshots/feed.png" width="260" />
+  <img src="./public/screenshots/prompt.png" width="260" />
+</p>
 
 ## Core Idea
 
