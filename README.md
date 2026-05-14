@@ -1,36 +1,282 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InspireX
 
-## Getting Started
+A focused motivational reel app designed to interrupt doomscrolling and reduce friction toward action.
 
-First, run the development server:
+Built as a mobile-first Progressive Web App (PWA) using Next.js.
+
+---
+
+## Live Demo
+
+https://inspire-x-pink.vercel.app
+
+Install as a PWA for the best experience.
+
+---
+
+## Preview
+
+![Feed Screen](./public/screenshots/feed.png)
+
+![Awareness Prompt](./public/screenshots/prompt.png)
+
+## Core Idea
+
+Most short-form platforms optimize for:
+
+- Endless scrolling
+- Retention loops
+- Dopamine spikes
+- Passive consumption
+
+InspireX attempts the opposite:
+
+- Curated intentional content
+- Reduced choice overload
+- Faster access to productive mindset
+- Psychological interruption prompts
+- Minimal friction launch experience
+
+---
+
+# Features
+
+## Motivational Reel Feed
+
+- Vertical reel-style scrolling
+- Mobile-first UI
+- Fast swipe navigation
+- Lightweight experience
+
+---
+
+## Psychological Awareness Prompt
+
+On app open:
+
+```text
+What are you avoiding?
+```
+
+Users see rotating prompts designed to create momentary self-awareness before consuming content.
+
+Example prompts:
+
+- Starting the hard task
+- Your unfinished work
+- Wasted time
+- Phone addiction
+- Your future self
+
+---
+
+## Progressive Web App (PWA)
+
+Install InspireX directly on your phone like a native app.
+
+- Standalone app experience
+- Home screen installation
+- Full-screen launch
+- Faster reopen experience
+
+---
+
+## Local Thumbnail System
+
+- Lightweight local thumbnail rendering
+- Reduced external dependency usage
+- Faster library loading
+
+---
+
+## Reel Library
+
+- Dedicated reel library screen
+- Grid-based browsing
+- Quick jump into feed
+
+---
+
+## Upload System
+
+- Upload motivational reels
+- Upload custom thumbnails
+- Categorize content
+
+---
+
+# Tech Stack
+
+## Frontend
+
+- Next.js 16
+- React
+- TypeScript
+- Tailwind CSS
+
+## Backend
+
+- Next.js Route Handlers
+- MongoDB
+
+## Media
+
+- ImageKit (legacy uploads)
+- Local storage thumbnails
+- PWA caching
+
+## Deployment
+
+- Vercel
+
+---
+
+# Project Structure
+
+```bash
+app/
+ ├── feed/
+ ├── library/
+ ├── upload/
+ ├── api/
+components/
+lib/
+models/
+public/
+```
+
+---
+
+# Getting Started
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/inspirex.git
+```
+
+```bash
+cd inspirex
+```
+
+---
+
+## 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 3. Create Environment Variables
+
+Create:
+
+```bash
+.env.local
+```
+
+Add:
+
+```env
+MONGODB_URI=your_mongodb_uri
+
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_URL_ENDPOINT=your_imagekit_url_endpoint
+```
+
+---
+
+## 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# Production Build
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# PWA Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Android Chrome
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Open deployed app
+2. Use app for a few seconds
+3. Tap Chrome menu
+4. Select:
+
+```text
+Install app
+```
+
+The app should now launch in standalone mode.
+
+---
+
+# Routes
+
+| Route | Purpose |
+|---|---|
+| `/feed` | Main reel feed |
+| `/library` | Reel library grid |
+| `/upload` | Upload new reels |
+| `/api/videos` | Fetch/store reel data |
+| `/api/upload` | Upload media |
+
+---
+
+# Product Philosophy
+
+InspireX is intentionally designed to avoid becoming another infinite entertainment feed.
+
+The goal is:
+
+```text
+Reduce doomscrolling friction.
+Increase action-start probability.
+```
+
+---
+
+# Future Ideas
+
+- Smart feed refresh
+- Offline reel packs
+- Personalized categories
+- Cached preview playback
+- Daily mindset packs
+- Usage analytics
+- Consistency tracking
+
+---
+
+# Disclaimer
+
+This project is experimental and built primarily as a behavioral tool and learning project.
+
+It is not affiliated with Instagram or Meta.
+
+---
+
+# License
+
+MIT License
