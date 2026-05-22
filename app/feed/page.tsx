@@ -29,6 +29,8 @@ function FeedContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPrompt, setShowPrompt] = useState(true);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallBanner, setShowInstallBanner] =
+  useState(false);
 
   const [promptOptions, setPromptOptions] = useState<string[]>([]);
 
@@ -150,6 +152,14 @@ function FeedContent() {
       );
     };
 
+    setTimeout(() => {
+      setShowInstallBanner(true);
+
+      setTimeout(() => {
+        setShowInstallBanner(false);
+      }, 6000);
+    }, 3000);
+
     window.addEventListener(
       "beforeinstallprompt",
       handler as EventListener
@@ -210,6 +220,29 @@ function FeedContent() {
       onTouchEnd={handleTouchEnd}
       className="relative h-dvh overflow-hidden bg-black overscroll-none pb-24"
     >
+      {showInstallBanner && installPrompt && (
+        <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-2xl border border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-white">
+                Install InspireX
+              </p>
+
+              <p className="text-xs text-zinc-400">
+                Open instantly like a real app
+              </p>
+            </div>
+
+            <button
+              onClick={handleInstall}
+              className="rounded-full bg-white px-3 py-1 text-xs font-medium text-black"
+            >
+              Install
+            </button>
+          </div>
+        </div>
+      )}
+
       {videos.map((video, index) => (
         <div id={`reel-${index}`} key={video._id}>
           <ReelCard
