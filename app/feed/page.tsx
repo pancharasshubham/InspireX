@@ -14,12 +14,21 @@ type Video = {
   thumbnailUrl?: string;
 };
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+}
+
 function FeedContent() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isMuted, setIsMuted] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showPrompt, setShowPrompt] = useState(true);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   const [promptOptions, setPromptOptions] = useState<string[]>([]);
 
@@ -131,6 +140,30 @@ function FeedContent() {
   }, [currentIndex]);
 
   useEffect(() => {
+    const handler = (
+      e: Event
+    ) => {
+      e.preventDefault();
+
+      setInstallPrompt(
+        e as BeforeInstallPromptEvent
+      );
+    };
+
+    window.addEventListener(
+      "beforeinstallprompt",
+      handler as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handler as EventListener
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     if (!videos.length) return;
     if (isLoading || showPrompt) return;
 
@@ -155,6 +188,19 @@ function FeedContent() {
       goToIndex(currentIndex + 1);
     } else {
       goToIndex(currentIndex - 1);
+    }
+  };
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+
+    installPrompt.prompt();
+
+    const choice =
+      await installPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      setInstallPrompt(null);
     }
   };
 
@@ -223,6 +269,15 @@ function FeedContent() {
       )}
 
       {!isLoading && !showPrompt && <BottomNav />}
+
+      {installPrompt && (
+        <button
+          onClick={handleInstall}
+          className="fixed bottom-24 right-4 z-50 rounded-full bg-white px-4 py-2 text-sm font-medium text-black"
+        >
+          Install App
+        </button>
+      )}
     </main>
   );
 }
