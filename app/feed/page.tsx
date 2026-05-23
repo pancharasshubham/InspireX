@@ -6,6 +6,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import nextDynamic from "next/dynamic";
 import BottomNav from "@/components/BottomNav";
 import { useSearchParams } from "next/navigation";
+import { track } from "@/lib/track";
 
 const ReelCard = nextDynamic(
 () => import("@/components/ReelCard"),
@@ -44,15 +45,31 @@ function FeedContent() {
   const searchParams = useSearchParams();
   const startIndex = Number(searchParams.get("index") || 0);
   const [initialIndex, setInitialIndex] = useState(0);
-  
 
   const startY = useRef(0);
+
+  const sessionStart =
+  useRef<number>(0);
+
+  useEffect(() => {
+    sessionStart.current =
+      Date.now();
+  }, []);
 
   const goToIndex = useCallback(
      (index: number, smooth: boolean = true) => {
         const safeIndex = Math.max(0, Math.min(index, videos.length - 1));
 
         setCurrentIndex(safeIndex);
+
+        track(
+          "reel_view",
+          {
+            reelIndex: safeIndex,
+            reelId:
+              videos[safeIndex]?._id
+          }
+        );
 
         const target = document.getElementById(`reel-${safeIndex}`);
 
@@ -61,7 +78,7 @@ function FeedContent() {
         block: "start",
         });
      },
-     [videos.length] 
+     [videos] 
  );
 
   useEffect(() => {
@@ -134,6 +151,8 @@ function FeedContent() {
       now.toString()
     );
 
+    track("app_open");
+
     const finalVideos =
       shouldRefresh
         ? [...data.data].sort(
@@ -191,6 +210,25 @@ function FeedContent() {
     );
   }, [currentIndex]);
 
+ useEffect(() => {
+  const startTime =
+    sessionStart.current;
+
+  return () => {
+    track(
+      "session_duration",
+      {
+        seconds: Math.floor(
+          (
+            Date.now() -
+            startTime
+          ) / 1000
+        )
+      }
+    );
+  };
+}, []);
+
   useEffect(() => {
   const nextVideo =
     videos[currentIndex + 1];
@@ -237,6 +275,10 @@ function FeedContent() {
       setInstallPrompt(null);
     };
 
+    track(
+      "install_success"
+    );
+
     window.addEventListener(
       "appinstalled",
       appInstalledHandler
@@ -265,6 +307,8 @@ function FeedContent() {
     return () => clearTimeout(timer);
   }, [videos.length,  initialIndex, startIndex, isLoading, showPrompt, goToIndex]);
 
+  
+
   const handleTouchStart = (e: React.TouchEvent) => {
     startY.current = e.touches[0].clientY;
   };
@@ -284,6 +328,10 @@ function FeedContent() {
 
   const handleInstall = async () => {
     if (!installPrompt) return;
+
+    track(
+      "install_clicked"
+    );
 
     installPrompt.prompt();
 
