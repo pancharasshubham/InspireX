@@ -9,6 +9,7 @@ type ReelCardProps = {
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   canPlay: boolean;
+  shouldPreload?: boolean;
 };
 
 export default function ReelCard({
@@ -17,6 +18,7 @@ export default function ReelCard({
   isMuted,
   setIsMuted,
   canPlay,
+  shouldPreload = false,
 }: ReelCardProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [showIcon, setShowIcon] = useState(false);
@@ -67,6 +69,7 @@ export default function ReelCard({
         muted={isMuted}
         loop
         playsInline
+        preload={shouldPreload ? "auto" : "metadata"}
         className="h-full w-full object-contain bg-black"
       />
 

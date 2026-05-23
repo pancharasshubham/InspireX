@@ -83,53 +83,96 @@ function FeedContent() {
     };
 
     const init = async () => {
-      const res = await fetch("/api/videos");
-      const data = await res.json();
-      
-      const lastIndex = Number(
-        localStorage.getItem("lastIndex") || 0
-      );
+      const cachedFeed =
+        localStorage.getItem("cachedFeed");
 
-      const lastOpen = Number(
-        localStorage.getItem("lastOpen") || 0
-      );
+      if (cachedFeed) {
+        const parsed =
+          JSON.parse(cachedFeed);
 
-      const now = Date.now();
-
-      const shouldRefresh =
-       now - lastOpen > 1000 * 60 * 60 * 2;
-
-      localStorage.setItem(
-      "lastOpen",
-      now.toString()
-      );
-
-      const finalVideos = shouldRefresh
-        ? [...data.data].sort(() => Math.random() - 0.5)
-        : data.data;
-
-      setVideos(finalVideos);
-      setInitialIndex(shouldRefresh ? 0 : lastIndex);
-
-      const introSeen = sessionStorage.getItem("introSeen");
-
-      if (introSeen) {
-        setIsLoading(false);
-        setShowPrompt(false);
-        return;
+        setVideos(parsed);
       }
 
-      setTimeout(() => {
-        setIsLoading(false);
-        setPromptOptions(getRandomPrompts());
-        setShowPrompt(true);
+    const res = await fetch(
+      "/api/videos"
+    );
 
-        setTimeout(() => {
-          setShowPrompt(false);
-          sessionStorage.setItem("introSeen", "true");
-        }, 8000);
-      }, 600);
-    };
+    const data = await res.json();
+
+    localStorage.setItem(
+      "cachedFeed",
+      JSON.stringify(data.data)
+    );
+
+    const lastIndex = Number(
+      localStorage.getItem(
+        "lastIndex"
+      ) || 0
+    );
+
+    const lastOpen = Number(
+      localStorage.getItem(
+        "lastOpen"
+      ) || 0
+    );
+
+    const now = Date.now();
+
+    const shouldRefresh =
+      now - lastOpen >
+      1000 * 60 * 60 * 2;
+
+    localStorage.setItem(
+      "lastOpen",
+      now.toString()
+    );
+
+    const finalVideos =
+      shouldRefresh
+        ? [...data.data].sort(
+            () => Math.random() - 0.5
+          )
+        : data.data;
+
+    setVideos(finalVideos);
+
+    setInitialIndex(
+      shouldRefresh
+        ? 0
+        : lastIndex
+    );
+
+    const introSeen =
+      sessionStorage.getItem(
+        "introSeen"
+      );
+
+    if (introSeen) {
+      setIsLoading(false);
+      setShowPrompt(false);
+      return;
+    }
+
+    setTimeout(() => {
+      setIsLoading(false);
+
+      setPromptOptions(
+        getRandomPrompts()
+      );
+
+      setShowPrompt(true);
+
+    setTimeout(() => {
+      setShowPrompt(false);
+
+      sessionStorage.setItem(
+        "introSeen",
+        "true"
+      );
+    }, 8000);
+
+  }, 600);
+};
 
     init();
   }, []);
@@ -140,6 +183,36 @@ function FeedContent() {
       currentIndex.toString()
     );
   }, [currentIndex]);
+
+  useEffect(() => {
+    const nextVideo =
+      videos[currentIndex + 1];
+
+    if (!nextVideo) return;
+
+    const preload =
+      document.createElement(
+        "link"
+      );
+
+    preload.rel = "preload";
+
+    preload.as = "video";
+
+    preload.href =
+      nextVideo.videoUrl;
+
+    document.head.appendChild(
+      preload
+    );
+
+    return () => {
+      document.head.removeChild(
+        preload
+      );
+    };
+
+  }, [currentIndex, videos]);
 
   useEffect(() => {
     const handler = (
@@ -265,6 +338,7 @@ function FeedContent() {
             isMuted={isMuted}
             setIsMuted={setIsMuted}
             canPlay={!isLoading && !showPrompt}
+            shouldPreload={index === currentIndex}
           />
         </div>
       ))}
