@@ -3,9 +3,16 @@
 export const dynamic = "force-dynamic";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import ReelCard from "@/components/ReelCard";
+import dynamic from "next/dynamic";
 import BottomNav from "@/components/BottomNav";
 import { useSearchParams } from "next/navigation";
+
+const ReelCard = dynamic(
+() => import("@/components/ReelCard"),
+{
+ssr:false
+}
+);
 
 type Video = {
   _id: string;
@@ -330,18 +337,37 @@ function FeedContent() {
         </div>
       )}
 
-      {videos.map((video, index) => (
-        <div id={`reel-${index}`} key={video._id}>
+      {videos
+        .filter(
+          (_, index) =>
+            Math.abs(index - currentIndex) <= 1
+        )
+        .map((video) => {
+          const actualIndex = videos.findIndex(
+            (v) => v._id === video._id
+          );
+        
+        return(
+        <div 
+        id={`reel-${actualIndex}`} 
+        key={video._id}
+        >
           <ReelCard
             title={video.title}
             videoUrl={video.videoUrl}
             isMuted={isMuted}
             setIsMuted={setIsMuted}
-            canPlay={!isLoading && !showPrompt}
-            shouldPreload={index === currentIndex}
+            canPlay={
+              !isLoading && 
+              !showPrompt
+            }
+            shouldPreload={
+              actualIndex === currentIndex
+            }
           />
         </div>
-      ))}
+        );
+      })}
 
       {showPrompt && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
