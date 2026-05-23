@@ -3,11 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import BottomNav from "@/components/BottomNav";
 import { useSearchParams } from "next/navigation";
 
-const ReelCard = dynamic(
+const ReelCard = nextDynamic(
 () => import("@/components/ReelCard"),
 {
 ssr:false
