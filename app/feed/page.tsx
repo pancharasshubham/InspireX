@@ -165,10 +165,24 @@ function FeedContent() {
       handler as EventListener
     );
 
+    const appInstalledHandler = () => {
+      setShowInstallBanner(false);
+      setInstallPrompt(null);
+    };
+
+    window.addEventListener(
+      "appinstalled",
+      appInstalledHandler
+    );
+
     return () => {
       window.removeEventListener(
         "beforeinstallprompt",
         handler as EventListener
+      );
+      window.removeEventListener(
+        "appinstalled",
+        appInstalledHandler
       );
     };
   }, []);
