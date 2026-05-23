@@ -192,34 +192,21 @@ function FeedContent() {
   }, [currentIndex]);
 
   useEffect(() => {
-    const nextVideo =
-      videos[currentIndex + 1];
+  const nextVideo =
+    videos[currentIndex + 1];
 
-    if (!nextVideo) return;
+  if (!nextVideo) return;
 
-    const preload =
-      document.createElement(
-        "link"
-      );
+  const video =
+    document.createElement("video");
 
-    preload.rel = "preload";
+  video.src =
+    nextVideo.videoUrl;
 
-    preload.as = "video";
+  video.preload =
+    "metadata";
 
-    preload.href =
-      nextVideo.videoUrl;
-
-    document.head.appendChild(
-      preload
-    );
-
-    return () => {
-      document.head.removeChild(
-        preload
-      );
-    };
-
-  }, [currentIndex, videos]);
+}, [currentIndex, videos]);
 
   useEffect(() => {
     const handler = (
