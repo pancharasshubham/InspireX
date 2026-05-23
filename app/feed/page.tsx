@@ -157,8 +157,8 @@ function FeedContent() {
 
       setTimeout(() => {
         setShowInstallBanner(false);
-      }, 6000);
-    }, 3000);
+      }, 10000);
+    }, 9000);
 
     window.addEventListener(
       "beforeinstallprompt",
@@ -303,14 +303,6 @@ function FeedContent() {
 
       {!isLoading && !showPrompt && <BottomNav />}
 
-      {installPrompt && (
-        <button
-          onClick={handleInstall}
-          className="fixed bottom-24 right-4 z-50 rounded-full bg-white px-4 py-2 text-sm font-medium text-black"
-        >
-          Install App
-        </button>
-      )}
     </main>
   );
 }
