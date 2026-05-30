@@ -271,13 +271,11 @@ function FeedContent() {
     );
 
     const appInstalledHandler = () => {
+       track("install_success");
+       
       setShowInstallBanner(false);
       setInstallPrompt(null);
     };
-
-    track(
-      "install_success"
-    );
 
     window.addEventListener(
       "appinstalled",
@@ -372,20 +370,10 @@ function FeedContent() {
         </div>
       )}
 
-      {videos
-        .filter(
-          (_, index) =>
-            Math.abs(index - currentIndex) <= 1
-        )
-        .map((video) => {
-          const actualIndex = videos.findIndex(
-            (v) => v._id === video._id
-          );
-        
-        return(
-        <div 
-        id={`reel-${actualIndex}`} 
-        key={video._id}
+      {videos.map((video, index) => (
+        <div
+          id={`reel-${index}`}
+          key={video._id}
         >
           <ReelCard
             title={video.title}
@@ -393,16 +381,15 @@ function FeedContent() {
             isMuted={isMuted}
             setIsMuted={setIsMuted}
             canPlay={
-              !isLoading && 
+              !isLoading &&
               !showPrompt
             }
             shouldPreload={
-              actualIndex === currentIndex
+              index === currentIndex
             }
           />
         </div>
-        );
-      })}
+      ))}
 
       {showPrompt && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/88 px-6">
