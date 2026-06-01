@@ -347,7 +347,7 @@ function FeedContent() {
       onTouchEnd={handleTouchEnd}
       className="relative h-dvh overflow-hidden overscroll-none pb-24 flex justify-center bg-linear-to-b from-zinc-900 to-black"
     >
-    <div className="relative h-full w-full max-w-[430px] bg-black overflow-hidden">
+    <div className="relative h-full w-full bg-black overflow-hidden md:max-w-[430px]">
       
        {showInstallBanner && installPrompt && (
         <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-2xl border border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl">

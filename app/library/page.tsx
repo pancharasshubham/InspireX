@@ -33,7 +33,7 @@ export default function LibraryPage() {
 
   return (
     <main className="min-h-dvh bg-black pb-24">
-      <div className="grid grid-cols-3 gap-0.5">
+      <div className="grid max-w-5xl mx-auto grid-cols-3 gap-1 lg:grid-cols-3">
         {videos.map((video, index) => (
           <button
             key={video._id}
