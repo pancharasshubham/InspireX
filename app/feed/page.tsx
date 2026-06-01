@@ -462,6 +462,24 @@ function FeedContent() {
 
       {!isLoading && !showPrompt && <BottomNav />}
 
+      {!isLoading && !showPrompt && (
+        <div className="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-3">
+          <button
+            onClick={() => goToIndex(currentIndex - 1)}
+            className="h-12 w-12 rounded-full bg-white/10 backdrop-blur text-white"
+          >
+            ↑
+          </button>
+
+          <button
+            onClick={() => goToIndex(currentIndex + 1)}
+            className="h-12 w-12 rounded-full bg-white/10 backdrop-blur text-white"
+          >
+            ↓
+          </button>
+        </div>
+      )}
+
     </div>
     </main>
   );
