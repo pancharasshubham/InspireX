@@ -51,6 +51,8 @@ function FeedContent() {
   const sessionStart =
   useRef<number>(0);
 
+  const wheelLock = useRef(false);
+
   useEffect(() => {
     sessionStart.current =
       Date.now();
@@ -324,6 +326,24 @@ function FeedContent() {
     }
   };
 
+  const handleWheel = (
+  e: React.WheelEvent
+) => {
+  if (wheelLock.current) return;
+
+  wheelLock.current = true;
+
+  if (e.deltaY > 0) {
+    goToIndex(currentIndex + 1);
+  } else {
+    goToIndex(currentIndex - 1);
+  }
+
+  setTimeout(() => {
+    wheelLock.current = false;
+  }, 400);
+};
+
   const handleInstall = async () => {
     if (!installPrompt) return;
 
@@ -345,6 +365,7 @@ function FeedContent() {
     <main
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onWheel={handleWheel}
       className="relative h-dvh overflow-hidden overscroll-none pb-24 flex justify-center bg-linear-to-b from-zinc-900 to-black"
     >
     <div className="relative h-full w-full bg-black overflow-hidden md:max-w-[430px]">
