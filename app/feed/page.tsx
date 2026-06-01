@@ -272,7 +272,7 @@ function FeedContent() {
 
     const appInstalledHandler = () => {
        track("install_success");
-       
+
       setShowInstallBanner(false);
       setInstallPrompt(null);
     };
@@ -345,9 +345,11 @@ function FeedContent() {
     <main
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative h-dvh overflow-hidden bg-black overscroll-none pb-24"
+      className="relative h-dvh overflow-hidden overscroll-none pb-24 flex justify-center bg-linear-to-b from-zinc-900 to-black"
     >
-      {showInstallBanner && installPrompt && (
+    <div className="relative h-full w-full max-w-[430px] bg-black overflow-hidden">
+      
+       {showInstallBanner && installPrompt && (
         <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-2xl border border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <div>
@@ -369,7 +371,7 @@ function FeedContent() {
           </div>
         </div>
       )}
-
+      
       {videos.map((video, index) => (
         <div
           id={`reel-${index}`}
@@ -439,6 +441,7 @@ function FeedContent() {
 
       {!isLoading && !showPrompt && <BottomNav />}
 
+    </div>
     </main>
   );
 }
