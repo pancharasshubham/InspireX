@@ -44,3 +44,4 @@ next-env.d.ts
 
 # security - app report files containing sensitive information
 *.report.html
+.env.local

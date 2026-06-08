@@ -1,9 +1,12 @@
+import posthog from "./posthog";
+
 type EventName =
   | "app_open"
   | "reel_view"
   | "install_clicked"
   | "install_success"
-  | "session_duration";
+  | "session_duration"
+  | "library_opened";
 
 export const track = (
   event: EventName,
@@ -16,6 +19,11 @@ export const track = (
   };
 
   console.log(payload);
+
+  posthog.capture(
+    event,
+    data
+  );
 
   const existing =
     JSON.parse(
