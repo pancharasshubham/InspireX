@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import Image from "next/image";
+import { track } from "@/lib/track";
 
 type Video = {
   _id: string;
@@ -29,6 +30,10 @@ export default function LibraryPage() {
     };
 
     fetchVideos();
+  }, []);
+
+  useEffect(() => {
+    track("library_opened");
   }, []);
 
   return (

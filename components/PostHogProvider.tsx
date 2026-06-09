@@ -12,7 +12,6 @@ export default function PostHogProvider({
   useEffect(() => {
     console.log("POSTHOG CLIENT", posthog);
 
-    posthog.capture("provider_loaded");
   }, []);
 
   return (

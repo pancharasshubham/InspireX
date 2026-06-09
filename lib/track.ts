@@ -3,10 +3,11 @@ import posthog from "./posthog";
 type EventName =
   | "app_open"
   | "reel_view"
+  | "library_opened"
+  | "prompt_selected"
   | "install_clicked"
   | "install_success"
-  | "session_duration"
-  | "library_opened";
+  | "session_duration";
 
 export const track = (
   event: EventName,

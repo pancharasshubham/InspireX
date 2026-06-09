@@ -436,7 +436,15 @@ function FeedContent() {
               {promptOptions.map((item) => (
                 <button
                   key={item}
-                  onClick={() => setShowPrompt(false)}
+                  onClick={() => {
+                    track(
+                    "prompt_selected",
+                    {
+                      prompt: item,
+                    }
+                  );
+                  setShowPrompt(false);
+                  }}
                   className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-zinc-200 backdrop-blur active:scale-95"
                 >
                   {item}
