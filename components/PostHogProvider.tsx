@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import posthog from "@/lib/posthog";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 
@@ -8,5 +9,15 @@ export default function PostHogProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <PHProvider client={posthog}>{children}</PHProvider>;
+  useEffect(() => {
+    console.log("POSTHOG CLIENT", posthog);
+
+    posthog.capture("provider_loaded");
+  }, []);
+
+  return (
+    <PHProvider client={posthog}>
+      {children}
+    </PHProvider>
+  );
 }
